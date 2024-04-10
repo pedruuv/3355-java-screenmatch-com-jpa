@@ -36,6 +36,8 @@ public class Principal {
                     1 - Buscar séries
                     2 - Buscar episódios
                     3- Listar séries buscadas
+                    4- Buscar série por título
+                    5- Buscar séries por ator
                     0 - Sair
                     """;
 
@@ -53,12 +55,46 @@ public class Principal {
                 case 3:
                     listarSeriesBuscadas();
                     break;
+                case 4:
+                    buscarSeriePorTitulo();
+                    break;
+                case 5:
+                    buscarSeriePorAtor();
+                    break;
                 case 0:
                     System.out.println("Saindo...");
                     break;
                 default:
                     System.out.println("Opção inválida");
             }
+        }
+    }
+
+    private void buscarSeriePorAtor() {
+        System.out.println("Digite o nome do ator: ");
+        var nomeAtor = leitura.nextLine();
+        System.out.println("Avaliações a partir de qual nota: ");
+        var notaSerie = leitura.nextDouble();
+
+        List<Serie> seriesEncontradas = repository
+                .findByAtoresContainingIgnoreCaseAndAvaliacaoGreaterThanEqual(nomeAtor, notaSerie);
+
+        System.out.println("Séries em que " + nomeAtor.toUpperCase() + " atuou: \n");
+        seriesEncontradas.forEach(s -> System.out.println(s.getTitulo() + " Avaliação: " +
+                s.getAvaliacao()));
+
+    }
+
+    private void buscarSeriePorTitulo() {
+        System.out.println("Digite o nome da série: ");
+        var nomeSerie = leitura.nextLine();
+
+        Optional<Serie> serieBuscada = repository.findByTituloContainingIgnoreCase(nomeSerie);
+
+        if (serieBuscada.isPresent()) {
+            System.out.println("Dados da série:\n" + serieBuscada.get());
+        } else {
+            System.out.println("Série não encontrada");
         }
     }
 
@@ -81,8 +117,7 @@ public class Principal {
         System.out.println("Digite o nome da série:");
         var nomeSerie = leitura.nextLine();
 
-        Optional<Serie> serie = series.stream().filter(s -> s.getTitulo().toLowerCase()
-                .contains(nomeSerie.toLowerCase())).findFirst();
+        Optional<Serie> serie = repository.findByTituloContainingIgnoreCase(nomeSerie);
 
         if (serie.isPresent()) {
             var serieEncontrada = serie.get();
@@ -97,7 +132,7 @@ public class Principal {
             temporadas.forEach(System.out::println);
 
             List<Episodio> episodios = temporadas.stream().flatMap(t -> t.episodios()
-            .stream().map(e -> new Episodio(t.numero(), e))).collect(Collectors.toList());
+                    .stream().map(e -> new Episodio(t.numero(), e))).collect(Collectors.toList());
 
             serieEncontrada.setEpisodios(episodios);
             repository.save(serieEncontrada);
