@@ -1,5 +1,6 @@
 package br.com.alura.screenmatch.principal;
 
+import br.com.alura.screenmatch.model.Categoria;
 import br.com.alura.screenmatch.model.DadosSerie;
 import br.com.alura.screenmatch.model.DadosTemporada;
 import br.com.alura.screenmatch.model.Episodio;
@@ -36,6 +37,9 @@ public class Principal {
                     4- Buscar série por título
                     5- Buscar séries por ator
                     6- Top 5 séries
+                    7- Buscar séries por Categoria
+                    8- Buscar séries por número máximo de temporadas
+                    9- Buscar episódios por trecho
                     0 - Sair
                     """;
 
@@ -62,6 +66,15 @@ public class Principal {
                 case 6:
                     buscarTop5Series();
                     break;
+                case 7:
+                    buscarSeriesPorCategoria();
+                    break;
+                case 8:
+                    buscarPorNumeroTemporadas();
+                    break;
+                case 9:
+                    buscarEpisodioPorTrecho();
+                    break;
                 case 0:
                     System.out.println("Saindo...");
                     break;
@@ -71,10 +84,35 @@ public class Principal {
         }
     }
 
+    private void buscarEpisodioPorTrecho() {
+        System.out.println("Digite o trecho do episódio para busca: ");
+        var trechoEpisodio = leitura.nextLine();
+
+        List<Episodio> episodiosEncontrados = repository.episodiosPorTrecho(trechoEpisodio);
+        episodiosEncontrados.forEach(System.out::println);
+    }
+
+    private void buscarPorNumeroTemporadas() {
+        System.out.println("Digite o número máximo desejado: ");
+        var numTemporadas = leitura.nextInt();
+        List<Serie> seriesPorNumTemporadas = repository.seriesPorTemporada(numTemporadas);
+        seriesPorNumTemporadas.forEach(System.out::println);
+    }
+
+    private void buscarSeriesPorCategoria() {
+        System.out.println("Qual categoria da séries: ");
+        var nomeGenero = leitura.nextLine();
+
+        Categoria categoria = Categoria.fromPortugues(nomeGenero);
+        List<Serie> seriesPorCategoria = repository.findByGenero(categoria);
+
+        System.out.println("Séries do Gênero: " + nomeGenero);
+        seriesPorCategoria.forEach(System.out::println);
+    }
+
     private void buscarTop5Series() {
         List<Serie> topSeries = repository.findTop5ByOrderByAvaliacaoDesc();
-        topSeries.forEach(s -> 
-        System.out.println(s.getTitulo() + " Avaliação " + s.getAvaliacao() + "\n"));
+        topSeries.forEach(s -> System.out.println(s.getTitulo() + " Avaliação " + s.getAvaliacao() + "\n"));
     }
 
     private void buscarSeriePorAtor() {
