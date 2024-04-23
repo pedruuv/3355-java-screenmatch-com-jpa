@@ -26,4 +26,7 @@ public interface SerieRepository extends JpaRepository<Serie, Long> {
     List<Episodio> episodiosPorTrecho(String trechoEpisodio);
 
 
+    @Query("select s from Serie s JOIN s.episodios e GROUP BY s ORDER BY MAX(e.dataLancamento) DESC LIMIT 5")
+    List<Serie> getMostRecentEpisodes();
+
 }
